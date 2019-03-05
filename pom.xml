@@ -12,6 +12,7 @@
         <lombok.version>1.18.4</lombok.version>
         <junit.version>4.12</junit.version>
         <assertj.version>3.11.1</assertj.version>
+        <jfree.version>1.0.1</jfree.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <guava.version>27.0-jre</guava.version>
@@ -39,6 +40,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart-fx</artifactId>
+                <version>${jfree.version}</version>
             </dependency>
 
             <!--Test dependencies-->

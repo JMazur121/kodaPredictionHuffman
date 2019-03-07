@@ -32,7 +32,7 @@ public class Prediction {
 	public static int[] leftAndUpperNeighbourMedian(int[] source, int width, int height) {
 		int[] result = new int[source.length];
 		int[] medianTab = new int[3];
-		int index = 0, left, upper, upperLeft;
+		int index = 0;
 		//upper neighbours are CONST, thus median is equal to OUT_OF_BOUND_CONST too.
 		for (int x = 0; x < width; ++x)
 			result[index++] = source[x] - OUT_OF_BOUND_CONST;

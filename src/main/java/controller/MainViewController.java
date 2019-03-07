@@ -7,7 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -23,10 +23,11 @@ import java.util.ResourceBundle;
 public class MainViewController implements Initializable {
 
 	@FXML
+	private TextField entropyField;
+	@FXML
 	private GridPane inputPane;
 
 	private WrappedImageView inputImageView;
-
 
 	public void initialize(URL location, ResourceBundle resources) {
 		initializeInputView();
@@ -44,7 +45,8 @@ public class MainViewController implements Initializable {
 		chooser.setInitialDirectory(
 				new File(System.getProperty("user.home"))
 		);
-		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+//		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PGM", "*.pgm"));
 	}
 
 	private Image matToImage(Mat original) {
@@ -56,12 +58,10 @@ public class MainViewController implements Initializable {
 		int width = original.width(), height = original.height(), channels = original.channels();
 		byte[] sourcePixels = new byte[width * height * channels];
 		original.get(0, 0, sourcePixels);
-		if (original.channels() > 1)
-		{
+		if (original.channels() > 1) {
 			image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		}
-		else
-		{
+		else {
 			image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		}
 		final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
@@ -74,7 +74,7 @@ public class MainViewController implements Initializable {
 		configureFileChooser(fileChooser);
 		File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
 		if (file != null) {
-			Mat image = Imgcodecs.imread(file.getAbsolutePath());
+			Mat image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
 			Image loadedImage = matToImage(image);
 			inputImageView.setImage(loadedImage);
 		}

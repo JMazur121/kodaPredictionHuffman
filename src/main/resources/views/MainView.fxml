@@ -28,7 +28,7 @@
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                      <children>
                         <Label text="Entropia" />
-                        <TextField />
+                        <TextField fx:id="entropyField"/>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">

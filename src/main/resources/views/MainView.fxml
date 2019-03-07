@@ -28,19 +28,19 @@
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Entropia" />
-                        <TextField fx:id="entropyField" editable="false"/>
+                        <TextField fx:id="entropyField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Dlugość danych" />
-                        <TextField fx:id="dataLengthField" editable="false"/>
+                        <TextField fx:id="dataLengthField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Dlugosc zakodowanych danych" />
-                        <TextField fx:id="codedDataLengthField" editable="false"/>
+                        <TextField fx:id="codedDataLengthField" editable="false" />
                      </children>
                   </HBox>
                </children>
@@ -49,28 +49,28 @@
       </GridPane>
       <GridPane fx:id="outputPane">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" halignment="CENTER"/>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" halignment="CENTER"/>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" spacing="10.0">
                <children>
                   <Label text="Lewy" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Entropia" />
                         <TextField />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Dlugosc danych" />
-                        <TextField />
+                        <TextField prefHeight="0.0" prefWidth="134.0" />
                      </children>
                   </HBox>
                </children>
@@ -78,13 +78,13 @@
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
                   <Label text="Gora" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Entropia" />
-                        <TextField />
+                        <TextField prefHeight="0.0" prefWidth="134.0" />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="221.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Dlugosc danych" />
                         <TextField />
@@ -95,13 +95,13 @@
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
                   <Label text="Mediana" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Entropia" />
                         <TextField />
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
                         <Label text="Dlugosc danych" />
                         <TextField />

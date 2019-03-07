@@ -1,7 +1,5 @@
 package controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,18 +15,13 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import prediction.Prediction;
 import prediction.PredictionService;
 import utils.WrappedImageView;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import static org.opencv.core.Core.*;
 
 public class MainViewController implements Initializable {
@@ -51,8 +44,8 @@ public class MainViewController implements Initializable {
 	private PredictionService predictionService;
 	private Mat image;
 	private Mat convertedToInt;
-	private int[] imageData;
 
+	private int[] imageData;
 	private int[] leftPrediction;
 	private int[] upperPrediction;
 	private int[] medianPrediction;

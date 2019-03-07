@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import utils.WrappedImageView;
@@ -28,6 +29,8 @@ public class MainViewController implements Initializable {
 	private GridPane inputPane;
 
 	private WrappedImageView inputImageView;
+	private Mat image;
+	private int[] imageData;
 
 	public void initialize(URL location, ResourceBundle resources) {
 		initializeInputView();
@@ -74,9 +77,13 @@ public class MainViewController implements Initializable {
 		configureFileChooser(fileChooser);
 		File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
 		if (file != null) {
-			Mat image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
+			image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
 			Image loadedImage = matToImage(image);
 			inputImageView.setImage(loadedImage);
+			Mat converted = new Mat();
+			image.convertTo(converted, CvType.CV_32S);
+			imageData = new int[image.width() * image.height()];
+			converted.get(0, 0, imageData);
 		}
 	}
 

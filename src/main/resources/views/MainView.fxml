@@ -17,7 +17,7 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" percentHeight="80.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" percentHeight="70.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -25,16 +25,22 @@
                <children>
                   <Button fx:id="loadImageButton" mnemonicParsing="false" onAction="#loadImage" text="Wczytaj obrazek" />
                   <Button mnemonicParsing="false" text="Histogramy" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Entropia" />
-                        <TextField fx:id="entropyField"/>
+                        <TextField fx:id="entropyField" editable="false"/>
                      </children>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Label text="Dlugość danych" />
+                        <TextField fx:id="dataLengthField" editable="false"/>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Dlugosc zakodowanych danych" />
-                        <TextField />
+                        <TextField fx:id="codedDataLengthField" editable="false"/>
                      </children>
                   </HBox>
                </children>
@@ -43,13 +49,13 @@
       </GridPane>
       <GridPane fx:id="outputPane">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" halignment="CENTER"/>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" halignment="CENTER"/>
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" valignment="CENTER"/>
         </rowConstraints>
          <children>
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">

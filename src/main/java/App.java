@@ -1,3 +1,4 @@
+import controller.MainViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,6 +19,8 @@ public class App extends Application {
 		primaryStage.setTitle(WINDOW_TITLE);
 		primaryStage.setScene(new Scene(root));
 		primaryStage.show();
+		MainViewController controller = loader.getController();
+		controller.setClosingHandler();
 	}
 
 	public static void main(String[] args) {

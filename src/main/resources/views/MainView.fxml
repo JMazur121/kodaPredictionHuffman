@@ -27,19 +27,19 @@
                   <Button mnemonicParsing="false" text="Histogramy" />
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Label text="Entropia" />
+                        <Label text="Entropia [bit]" />
                         <TextField fx:id="entropyField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Label text="Dlugość danych" />
+                        <Label text="Dlugość danych [B]" />
                         <TextField fx:id="dataLengthField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Label text="Dlugosc zakodowanych danych" />
+                        <Label text="Dlugosc zakodowanych danych [B]" />
                         <TextField fx:id="codedDataLengthField" editable="false" />
                      </children>
                   </HBox>
@@ -58,19 +58,19 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" spacing="10.0">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1">
                <children>
                   <Label text="Lewy" />
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Entropia" />
-                        <TextField />
+                        <Label text="Entropia [bit]" />
+                        <TextField fx:id="leftEntropyField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Dlugosc danych" />
-                        <TextField prefHeight="0.0" prefWidth="134.0" />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <TextField fx:id="leftDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>
                </children>
@@ -80,14 +80,14 @@
                   <Label text="Gora" />
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Entropia" />
-                        <TextField prefHeight="0.0" prefWidth="134.0" />
+                        <Label text="Entropia [bit]" />
+                        <TextField fx:id="upperEntropyField" editable="false" prefHeight="0.0" prefWidth="134.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Dlugosc danych" />
-                        <TextField />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <TextField fx:id="upperDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>
                </children>
@@ -97,14 +97,14 @@
                   <Label text="Mediana" />
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Entropia" />
-                        <TextField />
+                        <Label text="Entropia [bit]" />
+                        <TextField fx:id="medianEntropyField" editable="false" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label text="Dlugosc danych" />
-                        <TextField />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <TextField fx:id="medianDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>
                </children>

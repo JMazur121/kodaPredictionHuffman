@@ -1,8 +1,9 @@
 package controller;
 
+import frequency.FrequencyMap;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -15,55 +16,52 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
-import prediction.PredictionService;
+import prediction.Prediction;
 import utils.WrappedImageView;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import static org.opencv.core.Core.*;
 
 public class MainViewController implements Initializable {
 
-	@FXML
-	private TextField codedDataLengthField;
-	@FXML
-	private TextField dataLengthField;
-	@FXML
-	private GridPane outputPane;
-	@FXML
-	private TextField entropyField;
-	@FXML
-	private GridPane inputPane;
+	public TextField codedDataLengthField;
+	public TextField dataLengthField;
+	public GridPane outputPane;
+	public GridPane inputPane;
+	public TextField entropyField;
+	public TextField leftEntropyField;
+	public TextField upperEntropyField;
+	public TextField medianEntropyField;
 
 	private WrappedImageView inputImageView;
 	private WrappedImageView leftNeighbourView;
 	private WrappedImageView upperNeighbourView;
 	private WrappedImageView medianView;
-	private PredictionService predictionService;
 	private Mat image;
 	private Mat convertedToInt;
+
+	private ExecutorService worker;
 
 	private int[] imageData;
 	private int[] leftPrediction;
 	private int[] upperPrediction;
 	private int[] medianPrediction;
 
+	private FrequencyMap imageFrequency;
+	private FrequencyMap leftPredictionFrequency;
+	private FrequencyMap upperPredictionFreqency;
+	private FrequencyMap medianPredictionFrequency;
+
 	public void initialize(URL location, ResourceBundle resources) {
 		initializeInputView();
 		initializeOutputViews();
-		predictionService = new PredictionService();
-		predictionService.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null) {
-				leftPrediction = newValue.get(0);
-				upperPrediction = newValue.get(1);
-				medianPrediction = newValue.get(2);
-				leftNeighbourView.setImage(differentialImage(leftPrediction));
-				upperNeighbourView.setImage(differentialImage(upperPrediction));
-				medianView.setImage(differentialImage(medianPrediction));
-			}
-		});
+		worker = Executors.newSingleThreadExecutor();
 	}
 
 	private void initializeInputView() {
@@ -80,6 +78,13 @@ public class MainViewController implements Initializable {
 		outputPane.add(leftNeighbourView, 0, 0);
 		outputPane.add(upperNeighbourView, 0, 1);
 		outputPane.add(medianView, 0, 2);
+	}
+
+	private void initializeFrequencyMaps() {
+		imageFrequency = new FrequencyMap(imageData);
+		leftPredictionFrequency = new FrequencyMap(leftPrediction);
+		upperPredictionFreqency = new FrequencyMap(upperPrediction);
+		medianPredictionFrequency = new FrequencyMap(medianPrediction);
 	}
 
 	private void configureFileChooser(final FileChooser chooser) {
@@ -119,6 +124,32 @@ public class MainViewController implements Initializable {
 		return image;
 	}
 
+	private void calcPredictions() {
+		leftPrediction = Prediction.leftNeighbour(imageData, image.width(), image.height());
+		upperPrediction = Prediction.upperNeighbour(imageData, image.width(), image.height());
+		medianPrediction = Prediction.leftAndUpperNeighbourMedian(imageData, image.width(), image.height());
+		initializeFrequencyMaps();
+	}
+
+	private void setEntropy(double img, double left, double upper, double median) {
+		entropyField.setText(Double.toString(img));
+		leftEntropyField.setText(Double.toString(left));
+		upperEntropyField.setText(Double.toString(upper));
+		medianEntropyField.setText(Double.toString(median));
+	}
+
+	public void setClosingHandler() {
+		entropyField.getScene().getWindow().setOnCloseRequest(event -> {
+			worker.shutdown();
+			try {
+				if (!worker.awaitTermination(5000, TimeUnit.MILLISECONDS))
+					worker.shutdownNow();
+			} catch (InterruptedException e) {
+				worker.shutdownNow();
+			}
+		});
+	}
+
 	public void loadImage(ActionEvent event) {
 		final FileChooser fileChooser = new FileChooser();
 		configureFileChooser(fileChooser);
@@ -127,15 +158,25 @@ public class MainViewController implements Initializable {
 			image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
 			Image loadedImage = matToImage(image);
 			inputImageView.setImage(loadedImage);
-			dataLengthField.setText(Integer.toString(image.width() * image.height()) + " bytes");
+			dataLengthField.setText(Integer.toString(image.width() * image.height()));
 			convertedToInt = new Mat();
 			image.convertTo(convertedToInt, CvType.CV_32S);
 			imageData = new int[image.width() * image.height()];
 			convertedToInt.get(0, 0, imageData);
-			predictionService.setSource(imageData);
-			predictionService.setWidth(image.width());
-			predictionService.setHeight(image.height());
-			predictionService.restart();
+			worker.execute(() -> {
+				calcPredictions();
+				double imgEntropy, leftEntropy, upperEntropy, medianEntropy;
+				imgEntropy = imageFrequency.entropy();
+				leftEntropy = leftPredictionFrequency.entropy();
+				upperEntropy = upperPredictionFreqency.entropy();
+				medianEntropy = medianPredictionFrequency.entropy();
+				Platform.runLater(() -> {
+					leftNeighbourView.setImage(differentialImage(leftPrediction));
+					upperNeighbourView.setImage(differentialImage(upperPrediction));
+					medianView.setImage(differentialImage(medianPrediction));
+					setEntropy(imgEntropy, leftEntropy, upperEntropy, medianEntropy);
+				});
+			});
 		}
 	}
 

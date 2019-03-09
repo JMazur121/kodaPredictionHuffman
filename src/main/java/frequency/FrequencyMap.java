@@ -16,7 +16,7 @@ public class FrequencyMap {
 	}
 
 	public FrequencyMap(int[] values) {
-		super();
+		this();
 		for (int val : values)
 			increment(val);
 	}

@@ -4,14 +4,20 @@ import frequency.FrequencyData;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -23,10 +29,13 @@ import org.opencv.imgcodecs.Imgcodecs;
 import prediction.Prediction;
 import utils.HistogramMatrix;
 import utils.WrappedImageView;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.awt.image.RenderedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -70,6 +79,10 @@ public class MainViewController implements Initializable {
 		inputPane.getColumnConstraints().get(0).setHalignment(HPos.CENTER);
 		inputPane.getRowConstraints().get(0).setValignment(VPos.CENTER);
 		inputPane.add(inputImageView, 0, 0);
+		ContextMenu contextMenu = new ContextMenu();
+		MenuItem menuItem = new MenuItem("Zapisz dane");
+		contextMenu.getItems().addAll(menuItem);
+		inputImageView.setOnContextMenuRequested(event -> contextMenu.show(inputImageView, event.getScreenX(), event.getScreenY()));
 	}
 
 	private void initializeOutputViews() {
@@ -79,6 +92,33 @@ public class MainViewController implements Initializable {
 		outputPane.add(leftNeighbourView, 0, 0);
 		outputPane.add(upperNeighbourView, 0, 1);
 		outputPane.add(medianView, 0, 2);
+		configureImageSavingMenu(leftNeighbourView);
+		configureImageSavingMenu(upperNeighbourView);
+		configureImageSavingMenu(medianView);
+	}
+
+	private void configureImageSavingMenu(WrappedImageView imageView) {
+		ContextMenu saveMenu = new ContextMenu();
+		MenuItem item = new MenuItem("Zapisz jako PNG");
+		item.setOnAction(event -> {
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Save Image");
+			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG", "*.png"));
+			File file = fileChooser.showSaveDialog(imageView.getScene().getWindow());
+			if (file != null) {
+				try {
+					ImageIO.write(SwingFXUtils.fromFXImage(imageView.getImage(), null), "png", file);
+				} catch (IOException e) {
+					Alert alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Błąd zapisu");
+					alert.setHeaderText("Nieudana próba zapisu");
+					alert.setContentText(String.format("Nie udało się zapisać do pliku [%s]", file.getAbsolutePath()));
+					alert.showAndWait();
+				}
+			}
+		});
+		saveMenu.getItems().addAll(item);
+		imageView.setOnContextMenuRequested(event -> saveMenu.show(imageView, event.getScreenX(), event.getScreenY()));
 	}
 
 	private void configureFileChooser(final FileChooser chooser) {

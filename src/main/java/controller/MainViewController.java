@@ -83,7 +83,7 @@ public class MainViewController implements Initializable {
 	}
 
 	private void configureFileChooser(final FileChooser chooser) {
-		chooser.setTitle("Select script");
+		chooser.setTitle("Select image");
 		chooser.setInitialDirectory(
 				new File(System.getProperty("user.home"))
 		);

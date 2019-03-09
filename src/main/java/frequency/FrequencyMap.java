@@ -35,6 +35,11 @@ public class FrequencyMap {
 		return counter;
 	}
 
+	public void addAll(int[] values) {
+		for (int val : values)
+			increment(val);
+	}
+
 	public void increment(Integer key) {
 		Long counter = frequencyMap.get(key);
 		if (counter == null)

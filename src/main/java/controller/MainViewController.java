@@ -1,6 +1,6 @@
 package controller;
 
-import frequency.FrequencyMap;
+import frequency.FrequencyData;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -12,40 +12,30 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.fx.ChartViewer;
-import org.jfree.data.statistics.HistogramDataset;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import prediction.Prediction;
+import utils.HistogramMatrix;
 import utils.WrappedImageView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import static org.opencv.core.Core.*;
 
 public class MainViewController implements Initializable {
-
-	public static final int BINS = 50;
-	public static final String X_LABEL = "Wartosci probek";
-	public static final String Y_LABEL = "Czestosc";
 
 	public TextField codedDataLengthField;
 	public TextField dataLengthField;
@@ -63,20 +53,10 @@ public class MainViewController implements Initializable {
 	private WrappedImageView medianView;
 	private Mat image;
 	private Mat convertedToInt;
+	private int[] imageData;
 
 	private ExecutorService worker;
-
-	private int[] imageData;
-	private int[] leftPrediction;
-	private int[] upperPrediction;
-	private int[] medianPrediction;
-
-	private FrequencyMap imageFrequency;
-	private FrequencyMap leftPredictionFrequency;
-	private FrequencyMap upperPredictionFreqency;
-	private FrequencyMap medianPredictionFrequency;
-
-	private List<JFreeChart> histograms;
+	private FrequencyData frequencyData;
 
 	public void initialize(URL location, ResourceBundle resources) {
 		initializeInputView();
@@ -99,13 +79,6 @@ public class MainViewController implements Initializable {
 		outputPane.add(leftNeighbourView, 0, 0);
 		outputPane.add(upperNeighbourView, 0, 1);
 		outputPane.add(medianView, 0, 2);
-	}
-
-	private void initializeFrequencyMaps() {
-		imageFrequency = new FrequencyMap(imageData);
-		leftPredictionFrequency = new FrequencyMap(leftPrediction);
-		upperPredictionFreqency = new FrequencyMap(upperPrediction);
-		medianPredictionFrequency = new FrequencyMap(medianPrediction);
 	}
 
 	private void configureFileChooser(final FileChooser chooser) {
@@ -146,65 +119,41 @@ public class MainViewController implements Initializable {
 	}
 
 	private void calcPredictions() {
-		leftPrediction = Prediction.leftNeighbour(imageData, image.width(), image.height());
-		upperPrediction = Prediction.upperNeighbour(imageData, image.width(), image.height());
-		medianPrediction = Prediction.leftAndUpperNeighbourMedian(imageData, image.width(), image.height());
-		initializeFrequencyMaps();
+		frequencyData = new FrequencyData();
+		int[] leftPrediction = Prediction.leftNeighbour(imageData, image.width(), image.height());
+		int[] upperPrediction = Prediction.upperNeighbour(imageData, image.width(), image.height());
+		int[] medianPrediction = Prediction.leftAndUpperNeighbourMedian(imageData, image.width(), image.height());
+		frequencyData.setAll(imageData, leftPrediction, upperPrediction, medianPrediction);
 	}
 
-	private void setEntropy(double img, double left, double upper, double median) {
-		entropyField.setText(Double.toString(img));
-		leftEntropyField.setText(Double.toString(left));
-		upperEntropyField.setText(Double.toString(upper));
-		medianEntropyField.setText(Double.toString(median));
+	private void setEntropy() {
+		entropyField.setText(Double.toString(frequencyData.getImageFrequency().entropy()));
+		leftEntropyField.setText(Double.toString(frequencyData.getLeftPredictionFrequency().entropy()));
+		upperEntropyField.setText(Double.toString(frequencyData.getUpperPredictionFreqency().entropy()));
+		medianEntropyField.setText(Double.toString(frequencyData.getMedianPredictionFrequency().entropy()));
 	}
 
-	private void buildHistogram(String title, int[] values, boolean pred, Color color) {
-		HistogramDataset dataset = new HistogramDataset();
-		double[] vals = new double[values.length];
-		int idx = 0;
-		for (int i : values) {
-			vals[idx++] = i / 255.0;
-		}
-		if (pred)
-			dataset.addSeries("", vals, BINS, -1.0, 1.0);
-		else
-			dataset.addSeries("", vals, BINS, 0.0, 1.0);
-		JFreeChart histogram = ChartFactory.createHistogram(title, X_LABEL, Y_LABEL, dataset);
-		histogram.getXYPlot().getRenderer().setSeriesPaint(0, color);
-		histograms.add(histogram);
-	}
-
-	private void buildAllHistograms() {
-		buildHistogram("Oryginalny", imageData, false, Color.BLUE);
-		buildHistogram("Lewy-sasiad", leftPrediction, true, Color.ORANGE);
-		buildHistogram("Gorny-sasiad", upperPrediction, true, Color.DARK_GRAY);
-		buildHistogram("Mediana", medianPrediction, true, Color.LIGHT_GRAY);
+	private void readImage(File file) {
+		histogramsButton.setDisable(true);
+		image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
+		Image loadedImage = matToImage(image);
+		inputImageView.setImage(loadedImage);
+		dataLengthField.setText(Integer.toString(image.width() * image.height()));
+		convertedToInt = new Mat();
+		image.convertTo(convertedToInt, CvType.CV_32S);
+		imageData = new int[image.width() * image.height()];
+		convertedToInt.get(0, 0, imageData);
 	}
 
 	public void showHistograms(ActionEvent event) {
-		ChartViewer image, left, upper, median;
-		image = new ChartViewer(histograms.get(0));
-		left = new ChartViewer(histograms.get(1));
-		upper = new ChartViewer(histograms.get(2));
-		median = new ChartViewer(histograms.get(3));
 		Stage stage = new Stage();
-		GridPane gridpane = new GridPane();
-		ColumnConstraints column1 = new ColumnConstraints();
-		ColumnConstraints column2 = new ColumnConstraints();
-		column1.setPercentWidth(50);
-		column2.setPercentWidth(50);
-		gridpane.getColumnConstraints().addAll(column1, column2);
-		RowConstraints row1 = new RowConstraints();
-		RowConstraints row2 = new RowConstraints();
-		row1.setPercentHeight(50);
-		row2.setPercentHeight(50);
-		gridpane.getRowConstraints().addAll(row1, row2);
-		gridpane.add(image, 0, 0);
-		gridpane.add(left, 1, 0);
-		gridpane.add(upper, 0, 1);
-		gridpane.add(median, 1, 1);
-		stage.setScene(new Scene(gridpane));
+		List<double[]> values = frequencyData.getDoubles();
+		HistogramMatrix matrix = HistogramMatrix.newHistogramMatrix()
+				.withULChart("Oryginalny", values.get(0), 0.0, 1.0, Color.BLUE)
+				.withURChart("Lewy-sasiad", values.get(1), -1.0, 1.0, Color.ORANGE)
+				.withLLChart("Gorny-sasiad", values.get(2), -1.0, 1.0, Color.CYAN)
+				.withLRChart("Mediana", values.get(3), -1.0, 1.0, Color.GREEN);
+		stage.setScene(new Scene(matrix));
 		stage.setTitle("Histogramy");
 		stage.setWidth(800);
 		stage.setHeight(600);
@@ -230,29 +179,14 @@ public class MainViewController implements Initializable {
 		configureFileChooser(fileChooser);
 		File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
 		if (file != null) {
-			histogramsButton.setDisable(true);
-			image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
-			Image loadedImage = matToImage(image);
-			inputImageView.setImage(loadedImage);
-			dataLengthField.setText(Integer.toString(image.width() * image.height()));
-			convertedToInt = new Mat();
-			image.convertTo(convertedToInt, CvType.CV_32S);
-			imageData = new int[image.width() * image.height()];
-			convertedToInt.get(0, 0, imageData);
+			readImage(file);
 			worker.execute(() -> {
 				calcPredictions();
-				double imgEntropy, leftEntropy, upperEntropy, medianEntropy;
-				imgEntropy = imageFrequency.entropy();
-				leftEntropy = leftPredictionFrequency.entropy();
-				upperEntropy = upperPredictionFreqency.entropy();
-				medianEntropy = medianPredictionFrequency.entropy();
-				histograms = new ArrayList<>();
-				buildAllHistograms();
 				Platform.runLater(() -> {
-					leftNeighbourView.setImage(differentialImage(leftPrediction));
-					upperNeighbourView.setImage(differentialImage(upperPrediction));
-					medianView.setImage(differentialImage(medianPrediction));
-					setEntropy(imgEntropy, leftEntropy, upperEntropy, medianEntropy);
+					leftNeighbourView.setImage(differentialImage(frequencyData.getLeftPrediction()));
+					upperNeighbourView.setImage(differentialImage(frequencyData.getUpperPrediction()));
+					medianView.setImage(differentialImage(frequencyData.getMedianPrediction()));
+					setEntropy();
 					histogramsButton.setDisable(false);
 				});
 			});

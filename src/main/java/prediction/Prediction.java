@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Prediction {
 
-	public static final int OUT_OF_BOUND_CONST = 255;
+	public static final int OUT_OF_BOUND_CONST = 122;
 
 	public static int[] leftNeighbour(int[] source, int width, int height) {
 		int[] result = new int[source.length];

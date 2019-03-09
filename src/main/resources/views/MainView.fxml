@@ -24,7 +24,7 @@
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.rowIndex="1">
                <children>
                   <Button fx:id="loadImageButton" mnemonicParsing="false" onAction="#loadImage" text="Wczytaj obrazek" />
-                  <Button mnemonicParsing="false" text="Histogramy" />
+                  <Button fx:id="histogramsButton" mnemonicParsing="false" text="Histogramy" onAction="#showHistograms"/>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Entropia [bit]" />

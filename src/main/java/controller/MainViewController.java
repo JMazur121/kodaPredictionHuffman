@@ -8,20 +8,33 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.fx.ChartViewer;
+import org.jfree.data.statistics.HistogramDataset;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import prediction.Prediction;
 import utils.WrappedImageView;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +42,10 @@ import java.util.concurrent.TimeUnit;
 import static org.opencv.core.Core.*;
 
 public class MainViewController implements Initializable {
+
+	public static final int BINS = 50;
+	public static final String X_LABEL = "Wartosci probek";
+	public static final String Y_LABEL = "Czestosc";
 
 	public TextField codedDataLengthField;
 	public TextField dataLengthField;
@@ -38,6 +55,7 @@ public class MainViewController implements Initializable {
 	public TextField leftEntropyField;
 	public TextField upperEntropyField;
 	public TextField medianEntropyField;
+	public Button histogramsButton;
 
 	private WrappedImageView inputImageView;
 	private WrappedImageView leftNeighbourView;
@@ -58,10 +76,13 @@ public class MainViewController implements Initializable {
 	private FrequencyMap upperPredictionFreqency;
 	private FrequencyMap medianPredictionFrequency;
 
+	private List<JFreeChart> histograms;
+
 	public void initialize(URL location, ResourceBundle resources) {
 		initializeInputView();
 		initializeOutputViews();
 		worker = Executors.newSingleThreadExecutor();
+		histogramsButton.setDisable(true);
 	}
 
 	private void initializeInputView() {
@@ -138,6 +159,60 @@ public class MainViewController implements Initializable {
 		medianEntropyField.setText(Double.toString(median));
 	}
 
+	private void buildHistogram(String title, int[] values, boolean pred, Color color) {
+		HistogramDataset dataset = new HistogramDataset();
+		double[] vals = new double[values.length];
+		int idx = 0;
+		for (int i : values) {
+			vals[idx++] = i / 255.0;
+		}
+		if (pred)
+			dataset.addSeries("", vals, BINS, -1.0, 1.0);
+		else
+			dataset.addSeries("", vals, BINS, 0.0, 1.0);
+		JFreeChart histogram = ChartFactory.createHistogram(title, X_LABEL, Y_LABEL, dataset);
+		histogram.getXYPlot().getRenderer().setSeriesPaint(0, color);
+		histograms.add(histogram);
+	}
+
+	private void buildAllHistograms() {
+		buildHistogram("Oryginalny", imageData, false, Color.BLUE);
+		buildHistogram("Lewy-sasiad", leftPrediction, true, Color.ORANGE);
+		buildHistogram("Gorny-sasiad", upperPrediction, true, Color.DARK_GRAY);
+		buildHistogram("Mediana", medianPrediction, true, Color.LIGHT_GRAY);
+	}
+
+	public void showHistograms(ActionEvent event) {
+		ChartViewer image, left, upper, median;
+		image = new ChartViewer(histograms.get(0));
+		left = new ChartViewer(histograms.get(1));
+		upper = new ChartViewer(histograms.get(2));
+		median = new ChartViewer(histograms.get(3));
+		Stage stage = new Stage();
+		GridPane gridpane = new GridPane();
+		ColumnConstraints column1 = new ColumnConstraints();
+		ColumnConstraints column2 = new ColumnConstraints();
+		column1.setPercentWidth(50);
+		column2.setPercentWidth(50);
+		gridpane.getColumnConstraints().addAll(column1, column2);
+		RowConstraints row1 = new RowConstraints();
+		RowConstraints row2 = new RowConstraints();
+		row1.setPercentHeight(50);
+		row2.setPercentHeight(50);
+		gridpane.getRowConstraints().addAll(row1, row2);
+		gridpane.add(image, 0, 0);
+		gridpane.add(left, 1, 0);
+		gridpane.add(upper, 0, 1);
+		gridpane.add(median, 1, 1);
+		stage.setScene(new Scene(gridpane));
+		stage.setTitle("Histogramy");
+		stage.setWidth(800);
+		stage.setHeight(600);
+		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+		stage.show();
+	}
+
 	public void setClosingHandler() {
 		entropyField.getScene().getWindow().setOnCloseRequest(event -> {
 			worker.shutdown();
@@ -155,6 +230,7 @@ public class MainViewController implements Initializable {
 		configureFileChooser(fileChooser);
 		File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
 		if (file != null) {
+			histogramsButton.setDisable(true);
 			image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
 			Image loadedImage = matToImage(image);
 			inputImageView.setImage(loadedImage);
@@ -170,11 +246,14 @@ public class MainViewController implements Initializable {
 				leftEntropy = leftPredictionFrequency.entropy();
 				upperEntropy = upperPredictionFreqency.entropy();
 				medianEntropy = medianPredictionFrequency.entropy();
+				histograms = new ArrayList<>();
+				buildAllHistograms();
 				Platform.runLater(() -> {
 					leftNeighbourView.setImage(differentialImage(leftPrediction));
 					upperNeighbourView.setImage(differentialImage(upperPrediction));
 					medianView.setImage(differentialImage(medianPrediction));
 					setEntropy(imgEntropy, leftEntropy, upperEntropy, medianEntropy);
+					histogramsButton.setDisable(false);
 				});
 			});
 		}

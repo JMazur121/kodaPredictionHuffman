@@ -4,6 +4,8 @@ import lombok.Getter;
 import utils.HistogramMatrix;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 public class FrequencyData {
@@ -18,6 +20,7 @@ public class FrequencyData {
 	private FrequencyMap upperPredictionFreqency;
 	private FrequencyMap medianPredictionFrequency;
 
+	//potrzebne tylko do histogramow
 	private List<double[]> doubles;
 
 	public FrequencyData() {

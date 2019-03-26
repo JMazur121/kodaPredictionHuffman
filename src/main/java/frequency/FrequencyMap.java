@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class FrequencyMap {
 
+	@Getter
 	private Map<Integer, Long> frequencyMap;
 	@Getter
 	private long totalCount;
@@ -52,7 +53,7 @@ public class FrequencyMap {
 	public double entropy() {
 		double entropy = 0.0;
 		for (long val : frequencyMap.values()) {
-			double probability = (double) val / totalCount + 0.000001;
+			double probability = (double) val / (totalCount + 0.000001);
 			entropy -= probability * log2(probability);
 		}
 		return entropy;

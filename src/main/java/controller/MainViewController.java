@@ -42,8 +42,8 @@ import static org.opencv.core.Core.*;
 
 public class MainViewController implements Initializable {
 
-	public TextField codedDataLengthField;
 	public TextField dataLengthField;
+	public TextField codedDataLengthField;
 	public GridPane outputPane;
 	public GridPane inputPane;
 	public TextField entropyField;
@@ -51,6 +51,9 @@ public class MainViewController implements Initializable {
 	public TextField upperEntropyField;
 	public TextField medianEntropyField;
 	public Button histogramsButton;
+	public TextField leftDataLength;
+	public TextField upperDataLength;
+	public TextField medianDataLength;
 
 	private WrappedImageView inputImageView;
 	private WrappedImageView leftNeighbourView;
@@ -171,13 +174,25 @@ public class MainViewController implements Initializable {
 
 	private void calcHuffmanCodes() {
 		HuffmanTree originalTree = new HuffmanTree(frequencyData.getImageFrequency());
-		Map<Integer, String> originalTable = originalTree.getCodeBook();
+		HuffmanTree leftTree = new HuffmanTree(frequencyData.getLeftPredictionFrequency());
+		HuffmanTree upperTree = new HuffmanTree(frequencyData.getUpperPredictionFreqency());
+		HuffmanTree medianTree = new HuffmanTree(frequencyData.getMedianPredictionFrequency());
 		int[] codedSizes = new int[4];
-		frequencyData.getImageFrequency().getFrequencyMap().forEach((key, value) -> {
-			String code = originalTable.get(key);
-			codedSizes[0] += code.length() * value;
-		});
+		calcLength(originalTree.getCodeBook(), frequencyData.getImageFrequency().getFrequencyMap(), codedSizes, 0);
+		calcLength(leftTree.getCodeBook(), frequencyData.getLeftPredictionFrequency().getFrequencyMap(), codedSizes, 1);
+		calcLength(upperTree.getCodeBook(), frequencyData.getUpperPredictionFreqency().getFrequencyMap(), codedSizes, 2);
+		calcLength(medianTree.getCodeBook(), frequencyData.getMedianPredictionFrequency().getFrequencyMap(), codedSizes, 3);
 		codedDataLengthField.setText(Integer.toString(codedSizes[0] / 8));
+		leftDataLength.setText(Integer.toString(codedSizes[1] / 8));
+		upperDataLength.setText(Integer.toString(codedSizes[2] / 8));
+		medianDataLength.setText(Integer.toString(codedSizes[3] / 8));
+	}
+
+	private void calcLength(Map<Integer, String> codeBook, Map<Integer, Long> data, int[] length, int pos) {
+		data.forEach((key, value) -> {
+			String code = codeBook.get(key);
+			length[pos] += code.length() * value;
+		});
 	}
 
 	private void readImage(File file) {

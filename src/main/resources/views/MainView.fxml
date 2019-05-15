@@ -24,7 +24,7 @@
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.rowIndex="1">
                <children>
                   <Button fx:id="loadImageButton" mnemonicParsing="false" onAction="#loadImage" text="Wczytaj obrazek" />
-                  <Button fx:id="histogramsButton" mnemonicParsing="false" text="Histogramy" onAction="#showHistograms"/>
+                  <Button fx:id="histogramsButton" mnemonicParsing="false" onAction="#showHistograms" text="Histogramy" />
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Entropia [bit]" />
@@ -69,7 +69,7 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Zakodowane [B]" />
                         <TextField fx:id="leftDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>
@@ -86,7 +86,7 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Zakodowane [B]" />
                         <TextField fx:id="upperDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>
@@ -103,7 +103,7 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="0.0" prefWidth="221.0" spacing="10.0">
                      <children>
-                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Dlugość danych [B]" />
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Zakodowane [B]" />
                         <TextField fx:id="medianDataLength" editable="false" prefHeight="22.0" prefWidth="113.0" />
                      </children>
                   </HBox>

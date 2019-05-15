@@ -16,7 +16,7 @@ public class HistogramMatrix extends GridPane {
 	private ChartViewer lowerLeft;
 	private ChartViewer lowerRight;
 
-	public static final int BINS = 50;
+	public static final int BINS = 100;
 	public static final String X_LABEL = "Wartosci probek";
 	public static final String Y_LABEL = "Czestosc";
 

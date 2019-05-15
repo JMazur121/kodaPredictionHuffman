@@ -2,9 +2,7 @@ package frequency;
 
 import lombok.Getter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class FrequencyMap {
 

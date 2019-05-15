@@ -23,6 +23,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import prediction.Prediction;
+import tree.HuffmanTree;
 import utils.HistogramMatrix;
 import utils.WrappedImageView;
 import javax.imageio.ImageIO;
@@ -168,6 +169,17 @@ public class MainViewController implements Initializable {
 		medianEntropyField.setText(Double.toString(frequencyData.getMedianPredictionFrequency().entropy()));
 	}
 
+	private void calcHuffmanCodes() {
+		HuffmanTree originalTree = new HuffmanTree(frequencyData.getImageFrequency());
+		Map<Integer, String> originalTable = originalTree.getCodeBook();
+		int[] codedSizes = new int[4];
+		frequencyData.getImageFrequency().getFrequencyMap().forEach((key, value) -> {
+			String code = originalTable.get(key);
+			codedSizes[0] += code.length() * value;
+		});
+		codedDataLengthField.setText(Integer.toString(codedSizes[0] / 8));
+	}
+
 	private void readImage(File file) {
 		histogramsButton.setDisable(true);
 		image = Imgcodecs.imread(file.getAbsolutePath(), Imgcodecs.IMREAD_GRAYSCALE);
@@ -217,6 +229,7 @@ public class MainViewController implements Initializable {
 			readImage(file);
 			worker.execute(() -> {
 				calcPredictions();
+				calcHuffmanCodes();
 				Platform.runLater(() -> {
 					leftNeighbourView.setImage(differentialImage(frequencyData.getLeftPrediction()));
 					upperNeighbourView.setImage(differentialImage(frequencyData.getUpperPrediction()));

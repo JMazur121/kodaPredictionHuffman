@@ -73,7 +73,7 @@ public class HistogramMatrix extends GridPane {
 		return this;
 	}
 
-	private JFreeChart buildChart(String title, double[] values, double min, double max, Color col) {
+	public static JFreeChart buildChart(String title, double[] values, double min, double max, Color col) {
 		HistogramDataset dataset = new HistogramDataset();
 		dataset.addSeries("", values, BINS, min, max);
 		JFreeChart histogram = ChartFactory.createHistogram(title, X_LABEL, Y_LABEL, dataset);
